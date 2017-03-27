@@ -44,9 +44,18 @@
             return [d.y, d.x];
         });
 
-    var svg = d3.select("body").append("svg")
+    var one = d3.select("body").append("svg")
+        .attr("name", "ONE")
         .attr("width", width + margin.right + margin.left)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("height", height + margin.top + margin.bottom);
+    one
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var two = d3.select("body").append("svg")
+        .attr("name", "TWO")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", height + margin.top + margin.bottom);
+    two
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -64,12 +73,13 @@
         }
 
         root.children.forEach(collapse);
-        update(root);
+        update(one, 800, root);
+        update(two, 100, root);
     });
 
     d3.select(self.frameElement).style("height", "800px");
 
-    function update(source) {
+    function update(svg, offset, source) {
 
         // Compute the new tree layout.
         var nodes = tree.nodes(root).reverse(),
@@ -77,11 +87,11 @@
 
         // Normalize for fixed-depth.
         nodes.forEach(function (d) {
-            d.y = 100 + d.depth * 180;
+            d.y = offset + d.depth * 180;
         });
 
         // Update the nodes…
-        var node = svg.selectAll("g.node")
+        var node =  svg.selectAll("g.node")
             .data(nodes, function (d) {
                 return d.id || (d.id = ++i);
             });
@@ -145,7 +155,7 @@
             .style("fill-opacity", 1e-6);
 
         // Update the links…
-        var link = svg.selectAll("path.link")
+        var link =  svg.selectAll("path.link")
             .data(links, function (d) {
                 return d.target.id;
             });
